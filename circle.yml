@@ -15,10 +15,6 @@ jobs:
             docker build -t circleci .
       - deploy:
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              docker login -u $DOCKER_USER -p $DOCKER_PASS
-              docker tag circleci:latest vlcty/circleci:$CIRCLE_BUILD_NUM
-              docker push vlcty/circleci:$CIRCLE_BUILD_NUM
-            else
-              echo "Skipping deploy for non-master branch builds (#${CIRCLE_BUILD_NUM})"
-            fi
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker tag circleci:latest vlcty/circleci:$CIRCLE_BUILD_NUM
+            docker push vlcty/circleci:$CIRCLE_BUILD_NUM
