@@ -1,16 +1,17 @@
-FROM docker:latest
+FROM blitznote/debase:16.04
 
-ENV LFS_VERSION 2.1.0
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends git openssh-client make python python-pip python-setuptools && \
+	rm -rf /var/lib/apt/lists/*
 
-ENV PACKAGES "git curl openssh openssl ca-certificates groff less python py-pip"
+RUN mkdir -p /tmp/download && \
+	curl -L https://download.docker.com/linux/static/stable/x86_64/docker-17.09.1-ce.tgz | tar -xz -C /tmp/download && \
+	mv /tmp/download/docker/docker /usr/bin/ && \
+	curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-linux-amd64-2.3.4.tar.gz | tar -xz -C /tmp/download && \
+	mv /tmp/download/git-lfs-2.3.4/git-lfs /usr/bin && \
+	git lfs install && \
+	rm -rf /tmp/download && \
+	curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose && \
+	chmod +x /usr/bin/docker-compose
 
-RUN set -x \
-  && apk add --no-cache $PACKAGES \
-  && curl -fLO https://github.com/github/git-lfs/releases/download/v${LFS_VERSION}/git-lfs-linux-amd64-${LFS_VERSION}.tar.gz \
-  && tar xf git-lfs-linux-amd64-${LFS_VERSION}.tar.gz \
-  && mv git-lfs-${LFS_VERSION}/git-lfs /usr/local/bin/ \
-  && rm -rf git-lfs-linux-amd64-${LFS_VERSION}.tar.gz git-lfs-${LFS_VERSION} \
-  && git lfs install \
-  && git lfs version
-
-RUN pip install awscli
+RUN pip install --upgrade pip && pip install awscli
